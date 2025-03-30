@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试登录</title>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
+</head>
+<body>
+<div id="app">
+    <h1>测试登录</h1>
+    <div>
+        <label>用户名:</label>
+        <input type="text" v-model="username">
+    </div>
+    <div>
+        <label>密码:</label>
+        <input type="password" v-model="password">
+    </div>
+    <button @click="login">登录</button>
+    <div>
+        <h3>响应:</h3>
+        <pre>{{ response }}</pre>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            username: "",
+            password: "",
+            response: null
+        },
+        methods: {
+            login() {
+                const data = {
+                    username: this.username,
+                    password: this.password
+                };
+                
+                axios.post('/api/v1/user/login', data)
+                    .then(res => {
+                        this.response = res;
+                        console.log("完整响应:", res);
+                    })
+                    .catch(err => {
+                        this.response = err;
+                        console.error("错误:", err);
+                    });
+            }
+        }
+    });
+</script>
+</body>
+</html> 

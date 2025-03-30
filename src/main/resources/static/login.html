@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录 - 航班管理系统</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #003366 0%, #1e88e5 100%);
+        }
+        .login-container {
+            width: 400px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-header h1 {
+            color: #003366;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .login-header p {
+            color: #78909c;
+            font-size: 14px;
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+        }
+        .form-control:focus {
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.25);
+        }
+        .input-group-text {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px 0 0 8px;
+        }
+        .btn-login {
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-login:hover {
+            background-color: #002855;
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #78909c;
+        }
+        .register-link a {
+            color: #003366;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        
+        /* 用户类型选择器样式 */
+        .user-type-selector {
+            display: flex;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .user-type-option {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f5f5f5;
+            color: #495057;
+            font-weight: 500;
+        }
+        .user-type-option.active {
+            background-color: #003366;
+            color: white;
+        }
+        .user-type-option:first-child {
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        /* 自定义警告框样式 */
+        .custom-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        .custom-alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .custom-alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .custom-alert-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 15px;
+            opacity: 0.7;
+        }
+        
+        .custom-alert-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+    </style>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
+    <script src="js/axios-config.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div id="app" class="container">
+    <div class="login-container">
+        <div class="login-header">
+            <h1><i class="bi bi-airplane me-2"></i>航班管理系统</h1>
+            <p>请登录以访问系统功能</p>
+        </div>
+        
+        <!-- 用户类型选择器 -->
+        <div class="user-type-selector">
+            <div 
+                :class="['user-type-option', {'active': userType === 'normal'}]" 
+                @click="userType = 'normal'"
+            >
+                <i class="bi bi-person me-2"></i>普通用户
+            </div>
+            <div 
+                :class="['user-type-option', {'active': userType === 'admin'}]" 
+                @click="userType = 'admin'"
+            >
+                <i class="bi bi-shield-lock me-2"></i>管理员
+            </div>
+        </div>
+        
+        <form @submit.prevent="login">
+            <div class="mb-4">
+                <label for="username" class="form-label">用户名</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="username" v-model="user.username" placeholder="请输入用户名">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="form-label">密码</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input name="password" id="password" class="form-control" type="password" v-model="user.password" placeholder="请输入密码">
+                </div>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-login">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>登录
+                </button>
+            </div>
+            <div class="register-link">
+                <span v-if="userType === 'normal'">
+                    还没有账号? <a href="register.html">立即注册</a>
+                </span>
+                <span v-else>
+                    管理员账号请联系系统管理员获取
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    new Vue({
+        el:"#app",
+        data:{
+            user:{
+                username:null,
+                password:null
+            },
+            userType: 'normal' // 默认为普通用户
+        },
+        methods:{
+            login(){
+                if(this.user.username==null || this.user.username.trim()==''){
+                    this.showAlert('用户名不能为空', 'error');
+                    return false;
+                }
+                if(this.user.password==null || this.user.password.trim()==''){
+                    this.showAlert('密码不能为空', 'error');
+                    return false;
+                }
+                
+                // 根据用户类型选择不同的登录接口
+                let url = this.userType === 'normal' 
+                    ? '/api/v1/normalUser/login' 
+                    : '/api/v1/admin/login';
+                
+                console.log('登录请求URL:', url);
+                console.log('登录请求数据:', this.user);
+                
+                axios.post(url, this.user)
+                    .then(res=>{
+                        console.log('登录响应完整数据:', res);
+                        const responseData = res.data;
+                        console.log('登录响应data部分:', responseData);
+                        
+                        if(responseData && responseData.code === 200 && responseData.data) {
+                            let user = responseData.data;
+                            console.log('登录用户信息(存入前):', user);
+                            
+                            // 确保用户ID存在且为数字
+                            if(!user.id) {
+                                console.error('登录返回的用户缺少ID');
+                                this.showAlert('登录失败: 返回用户信息不完整', 'error');
+                                return;
+                            }
+                            
+                            sessionStorage.setItem("loginUser", JSON.stringify(user));
+                            console.log('已保存用户信息到sessionStorage');
+                            
+                            // 根据用户类型跳转到不同页面
+                            if(this.userType === 'normal') {
+                                console.log('跳转到普通用户页面');
+                                window.location.href = 'indexU.html';
+                            } else {
+                                console.log('跳转到管理员页面');
+                                window.location.href = 'indexA.html';
+                            }
+                        } else {
+                            console.error('登录失败:', responseData);
+                            this.showAlert('账号或密码错误', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('登录错误:', err);
+                        this.showAlert('登录失败，请稍后再试', 'error');
+                    });
+            },
+            showAlert(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `custom-alert ${type === 'success' ? 'custom-alert-success' : 'custom-alert-danger'}`;
+                
+                const alertContent = document.createElement('div');
+                alertContent.innerHTML = `<strong>${type === 'success' ? '成功' : '错误'}!</strong> ${message}`;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'custom-alert-close';
+                closeBtn.innerHTML = '×';
+                closeBtn.onclick = function() {
+                    alertDiv.remove();
+                };
+                
+                alertDiv.appendChild(alertContent);
+                alertDiv.appendChild(closeBtn);
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 3000);
+            }
+        }
+    })
+</script>
+</body>
+</html>

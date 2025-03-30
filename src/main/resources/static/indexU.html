@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户首页 - 航班管理系统</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #003366 0%, #1e88e5 100%);
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-welcome {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-avatar {
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .page-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #003366;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1e88e5;
+        }
+        .main-content {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            color: #003366;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .btn-primary {
+            background-color: #003366;
+            border-color: #003366;
+        }
+        .btn-primary:hover {
+            background-color: #002855;
+            border-color: #002855;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .table {
+            width: 100%;
+            margin-bottom: 0;
+            table-layout: fixed;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            border-top: none;
+        }
+        /* 乘客表格列宽设置 */
+        .passenger-table th:nth-child(1), 
+        .passenger-table td:nth-child(1) {
+            width: 8%;
+            text-align: center;
+        }
+        .passenger-table th:nth-child(2), 
+        .passenger-table td:nth-child(2) {
+            width: 20%;
+            text-align: center;
+        }
+        .passenger-table th:nth-child(3), 
+        .passenger-table td:nth-child(3) {
+            width: 42%;
+            text-align: center;
+        }
+        .passenger-table th:nth-child(4), 
+        .passenger-table td:nth-child(4) {
+            width: 30%;
+            text-align: center;
+        }
+        
+        /* 航班表格列宽设置 */
+        .flight-table th:nth-child(1), 
+        .flight-table td:nth-child(1) {
+            width: 6%;
+            text-align: center;
+        }
+        .flight-table th:nth-child(2), 
+        .flight-table td:nth-child(2) {
+            width: 16%;
+            text-align: center;
+        }
+        .flight-table th:nth-child(3), 
+        .flight-table td:nth-child(3) {
+            width: 16%;
+            text-align: center;
+        }
+        .flight-table th:nth-child(4), 
+        .flight-table td:nth-child(4) {
+            width: 25%;
+            text-align: center;
+        }
+        .flight-table th:nth-child(5), 
+        .flight-table td:nth-child(5) {
+            width: 15%;
+            text-align: center;
+        }
+        .flight-table th:nth-child(6), 
+        .flight-table td:nth-child(6) {
+            width: 22%;
+            text-align: center;
+        }
+        
+        .badge {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            min-width: 50px;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .exit-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .action-buttons {
+            white-space: nowrap;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        .empty-message {
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+        
+        /* 自定义警告框样式 */
+        .custom-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        .custom-alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .custom-alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .custom-alert-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 15px;
+            opacity: 0.7;
+        }
+        
+        .custom-alert-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+    </style>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
+    <script src="js/axios-config.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <div class="header">
+        <h1><i class="bi bi-airplane me-2"></i>航班管理系统</h1>
+        <div class="user-welcome">
+            <div class="user-avatar">
+                <i class="bi bi-person"></i>
+            </div>
+            <span>欢迎，{{user.username}}</span>
+            <button class="btn btn-danger exit-btn ms-3" @click="exit">
+                <i class="bi bi-box-arrow-right me-1"></i>退出
+            </button>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <!-- 乘客管理卡片 -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h5 mb-0"><i class="bi bi-people me-2"></i>乘客管理</h2>
+                <a href="bind.html" class="btn btn-primary btn-sm">
+                    <i class="bi bi-person-plus me-1"></i>添加绑定乘客
+                </a>
+            </div>
+            <div class="card-body">
+                <h3 class="h6 mb-3">您已绑定的乘客:</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover passenger-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">序号</th>
+                                <th class="text-center">姓名</th>
+                                <th class="text-center">身份证号</th>
+                                <th class="text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item, index) in passengers">
+                                <td>{{(passengersPage.pageNum - 1) * passengersPage.pageSize + index + 1}}</td>
+                                <td>{{item.name}}</td>
+                                <td>{{item.idNum}}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a class="btn btn-sm btn-outline-primary" :href="'passenger.html?id='+item.id">
+                                            <i class="bi bi-info-circle me-1"></i>详情
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger" @click="remove(item.id)">
+                                            <i class="bi bi-trash me-1"></i>解绑
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="passengers.length === 0">
+                                <td colspan="4" class="empty-message">
+                                    <i class="bi bi-exclamation-circle me-2"></i>您还没有绑定任何乘客
+                                    <div class="mt-3">
+                                        <a href="bind.html" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-person-plus me-1"></i>立即添加乘客
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <nav aria-label="Page navigation" v-if="passengersPage.total > 0">
+                    <ul class="pagination">
+                        <li class="page-item" v-if="passengersPage.pageNum > 1">
+                            <a class="page-link" href="#" @click="goto(1,1)" title="首页">
+                                首页
+                            </a>
+                        </li>
+                        <li class="page-item" v-if="passengersPage.hasPreviousPage">
+                            <a class="page-link" href="#" @click="goto(passengersPage.prePage,1)" title="上一页">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li :class="'page-item ' +(passengersPage.pageNum===item?'active':'')" 
+                            v-for="item in passengersPage.navigatepageNums">
+                            <a class="page-link" href="#" @click="goto(item,1)">{{item}}</a>
+                        </li>
+                        <li class="page-item" v-if="passengersPage.hasNextPage">
+                            <a class="page-link" href="#" @click="goto(passengersPage.nextPage,1)" title="下一页">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" v-if="passengersPage.pageNum < passengersPage.pages">
+                            <a class="page-link" href="#" @click="goto(passengersPage.pages,1)" title="末页">
+                                末页
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- 航班信息卡片 -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h5 mb-0"><i class="bi bi-calendar-check me-2"></i>航班信息</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover flight-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">序号</th>
+                                <th class="text-center">起始地</th>
+                                <th class="text-center">目的地</th>
+                                <th class="text-center">起飞时间</th>
+                                <th class="text-center">票价</th>
+                                <th class="text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item, index) in list">
+                                <td class="text-center">{{(params.pageNum - 1) * params.pageSize + index + 1}}</td>
+                                <td class="text-center">{{item.source}}</td>
+                                <td class="text-center">{{item.target}}</td>
+                                <td class="text-center">{{item.time}}</td>
+                                <td class="text-center">
+                                    <span :class="'badge ' + (item.num > 1000 ? 'bg-success' : 'bg-warning')">
+                                        ¥{{item.num}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a :href="'order.html?fid='+item.id" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-ticket-perforated me-1"></i>预订
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="list.length === 0">
+                                <td colspan="6" class="empty-message">
+                                    <i class="bi bi-exclamation-circle me-2"></i>暂无航班信息
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <nav aria-label="Page navigation" v-if="page.total > 0">
+                    <ul class="pagination">
+                        <li class="page-item" v-if="page.pageNum > 1">
+                            <a class="page-link" href="#" @click="goto(1,2)" title="首页">
+                                首页
+                            </a>
+                        </li>
+                        <li class="page-item" v-if="page.hasPreviousPage">
+                            <a class="page-link" href="#" @click="goto(page.prePage,2)" title="上一页">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li :class="'page-item ' +(page.pageNum===item?'active':'')" 
+                            v-for="item in page.navigatepageNums">
+                            <a class="page-link" href="#" @click="goto(item,2)">{{item}}</a>
+                        </li>
+                        <li class="page-item" v-if="page.hasNextPage">
+                            <a class="page-link" href="#" @click="goto(page.nextPage,2)" title="下一页">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" v-if="page.pageNum < page.pages">
+                            <a class="page-link" href="#" @click="goto(page.pages,2)" title="末页">
+                                末页
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            passengersPage:{},
+            passengers:[],
+            user:JSON.parse(sessionStorage.getItem("loginUser")),
+            list: [],
+            page: {},
+            params: {
+                pageNum: 1,
+                pageSize: 5
+            }
+        },
+        methods: {
+            remove(id){
+                if(!confirm('确认要解绑此乘客吗？')) {
+                    return;
+                }
+                
+                let url='/api/v1/passenger/remove/'+id
+                axios.get(url)
+                    .then(res=>{
+                        console.log('解绑响应:', res);
+                        const responseData = res.data;
+                        if(responseData && responseData.code === 200) {
+                            this.showAlert('解绑成功', 'success');
+                            
+                            // 检查当前页是否还有其他乘客
+                            if (this.passengers.length <= 1 && this.passengersPage.pageNum > 1) {
+                                // 如果当前页只有这一个乘客且不是第一页，则回到前一页
+                                this.getPassenger(this.passengersPage.pageNum - 1);
+                            } else {
+                                // 否则刷新当前页
+                                this.getPassenger(this.passengersPage.pageNum);
+                            }
+                        } else {
+                            this.showAlert(responseData?.message || '解绑失败', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('API错误:', err);
+                        this.showAlert('解绑失败，请稍后再试', 'error');
+                    });
+            },
+            goto(pn,i){
+                if(i==1){
+                    this.getPassenger(pn)
+                }
+                if(i==2){
+                    this.params.pageNum=pn
+                    this.loadData()
+                }
+            },
+            exit(){
+                sessionStorage.removeItem("loginUser")
+                window.location.href='login.html'
+            },
+            loadData() {
+                let url = "/api/v1/flight/page"
+                axios.post(url, this.params)
+                    .then(res => {
+                        console.log('航班分页数据:', res);
+                        const responseData = res.data;
+                        if(responseData && responseData.code === 200 && responseData.data) {
+                            this.list = responseData.data.list || [];
+                            this.page = responseData.data;
+                            console.log('处理后的航班数据:', this.list);
+                        } else {
+                            this.list = [];
+                            this.page = { total: 0, pageNum: 1 };
+                            console.error('航班数据格式错误:', responseData);
+                            this.showAlert('航班数据格式错误', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('API错误:', err);
+                        this.showAlert('加载航班信息失败', 'error');
+                    });
+            },
+            getPassenger(pn){
+                // 确保用户ID有效
+                if (!this.user || !this.user.id) {
+                    console.error('用户信息无效或未登录');
+                    this.showAlert('请先登录', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                    return;
+                }
+                
+                // 构建请求参数，确保页码合法
+                let params = {
+                    pageNum: pn && pn > 0 ? pn : 1,
+                    pageSize: 5,
+                    uid: this.user.id
+                };
+                
+                console.log('【乘客数据】请求参数:', params);
+                console.log('【乘客数据】当前用户ID:', this.user.id);
+                
+                let url='/api/v1/passenger/page';
+                console.log('【乘客数据】请求URL:', url);
+                
+                axios.post(url, params)
+                    .then(res=>{
+                        console.log('【乘客数据】API响应:', res);
+                        const responseData = res.data;
+                        
+                        if(responseData && responseData.code === 200 && responseData.data) {
+                            // 保存分页信息，即使列表为空
+                            this.passengersPage = responseData.data;
+                            
+                            // 获取乘客列表
+                            const passengerList = responseData.data.list || [];
+                            this.passengers = passengerList;
+                            
+                            console.log('【乘客数据】处理后的数据:', this.passengers);
+                            console.log('【乘客数据】分页信息:', this.passengersPage);
+                            
+                            // 处理页码逻辑
+                            if (passengerList.length === 0 && params.pageNum > 1) {
+                                // 如果当前页没有数据且不是第一页，则返回到上一页
+                                console.log('【乘客数据】当前页无数据，尝试加载上一页');
+                                this.getPassenger(params.pageNum - 1);
+                                return;
+                            }
+                            
+                            // 如果总页数为0，但仍有数据，修正页码显示
+                            if (this.passengersPage.pages === 0 && passengerList.length > 0) {
+                                this.passengersPage.pages = 1;
+                                this.passengersPage.pageNum = 1;
+                            }
+                            
+                            // 如果没有导航页码但有数据，创建一个简单的页码导航
+                            if ((!this.passengersPage.navigatepageNums || this.passengersPage.navigatepageNums.length === 0) 
+                                && this.passengersPage.pages > 0) {
+                                this.passengersPage.navigatepageNums = [1];
+                                for (let i = 2; i <= this.passengersPage.pages; i++) {
+                                    this.passengersPage.navigatepageNums.push(i);
+                                }
+                            }
+                        } else {
+                            // 错误处理
+                            this.passengers = [];
+                            this.passengersPage = { 
+                                total: 0, 
+                                pageNum: 1,
+                                pages: 0,
+                                navigatepageNums: [] 
+                            };
+                            console.error('【乘客数据】格式错误:', responseData);
+                            this.showAlert((responseData && responseData.message) || '乘客数据格式错误', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('【乘客数据】API错误:', err);
+                        this.showAlert('加载乘客信息失败', 'error');
+                        this.passengers = [];
+                        this.passengersPage = { 
+                            total: 0, 
+                            pageNum: 1,
+                            pages: 0,
+                            navigatepageNums: [] 
+                        };
+                    });
+            },
+            showAlert(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `custom-alert ${type === 'success' ? 'custom-alert-success' : 'custom-alert-danger'}`;
+                
+                const alertContent = document.createElement('div');
+                alertContent.innerHTML = `<strong>${type === 'success' ? '成功' : '错误'}!</strong> ${message}`;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'custom-alert-close';
+                closeBtn.innerHTML = '×';
+                closeBtn.onclick = function() {
+                    alertDiv.remove();
+                };
+                
+                alertDiv.appendChild(alertContent);
+                alertDiv.appendChild(closeBtn);
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 3000);
+            }
+        },
+        mounted() {
+            // 首先检查用户登录状态
+            const userInfo = sessionStorage.getItem("loginUser");
+            if (!userInfo) {
+                this.showAlert('请先登录', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+            
+            try {
+                this.user = JSON.parse(userInfo);
+                console.log('当前登录用户信息:', this.user);
+                
+                // 检查用户ID是否存在
+                if (!this.user.id) {
+                    console.error('用户ID缺失');
+                    this.showAlert('用户信息不完整，请重新登录', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                    return;
+                }
+                
+                // 输出更多调试信息
+                console.log('用户ID:', this.user.id);
+                console.log('用户类型:', this.user.userType);
+                
+                // 加载航班数据
+                this.loadData();
+                
+                // 加载乘客数据并添加额外调试信息
+                this.getPassenger();
+            } catch (e) {
+                console.error('解析用户信息错误:', e);
+                this.showAlert('登录状态异常，请重新登录', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            }
+        }
+    })
+</script>
+</body>
+</html>

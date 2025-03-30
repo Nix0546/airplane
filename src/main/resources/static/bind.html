@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绑定乘客 - 航班管理系统</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #003366 0%, #1e88e5 100%);
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 80px);
+        }
+        .passenger-container {
+            width: 550px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .passenger-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .passenger-header h1 {
+            color: #003366;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .passenger-header p {
+            color: #78909c;
+            font-size: 14px;
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .form-control:focus {
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.25);
+        }
+        .input-group-text {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px 0 0 8px;
+        }
+        .btn-submit {
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background-color: #002855;
+        }
+        .btn-back {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-back:hover {
+            background-color: #c82333;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        /* 自定义警告框样式 */
+        .custom-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        .custom-alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .custom-alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .custom-alert-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 15px;
+            opacity: 0.7;
+        }
+        
+        .custom-alert-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+    </style>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
+    <script src="js/axios-config.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div id="app" class="container">
+    <div class="passenger-container">
+        <div class="passenger-header">
+            <h1><i class="bi bi-airplane me-2"></i>航班管理系统</h1>
+            <p>添加乘客信息</p>
+        </div>
+        <form method="post" @submit.prevent="submit">
+            <div class="mb-3">
+                <label for="passengerName" class="form-label">乘客姓名</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="passengerName" v-model="passenger.name" placeholder="请输入乘客姓名">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="idNumber" class="form-label">身份证号</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                    <input type="text" class="form-control" id="idNumber" v-model="passenger.idNum" placeholder="请输入身份证号">
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-submit" type="submit">
+                    <i class="bi bi-check-circle me-2"></i>提交
+                </button>
+                <button class="btn btn-back" type="button" @click="goBack">
+                    <i class="bi bi-arrow-left me-2"></i>返回
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    new Vue({
+        el:'#app',
+        data:{
+            passenger:{
+                name:null,
+                idNum:null,
+                userId:null,
+            },
+            user:JSON.parse(sessionStorage.getItem("loginUser"))
+        },
+        methods:{
+            submit(){
+                if(this.passenger.name==null || this.passenger.name.trim()==''){
+                    this.showAlert('乘客姓名不能为空', 'error');
+                    return false;
+                }
+                if(this.passenger.idNum==null || this.passenger.idNum.trim()==''){
+                    this.showAlert('身份证号不能为空', 'error');
+                    return false;
+                }
+                
+                // 检查用户登录状态
+                if(!this.user || !this.user.id) {
+                    console.error('用户未登录或ID缺失');
+                    this.showAlert('请先登录后再操作', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                    return false;
+                }
+                
+                console.log('当前用户:', this.user);
+                this.passenger.userId = this.user.id;
+                console.log('待提交的乘客信息:', this.passenger);
+                
+                let url='/api/v1/passenger/save';
+                axios.post(url, this.passenger)
+                    .then(res=>{
+                        console.log('提交响应:', res);
+                        const responseData = res.data;
+                        if(responseData && responseData.code === 200) {
+                            this.showAlert('添加乘客成功，即将返回首页', 'success');
+                            setTimeout(() => {
+                                window.location.href='indexU.html';
+                            }, 2000);
+                        } else {
+                            this.showAlert(responseData?.message || '添加乘客失败', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('添加乘客错误:', err);
+                        this.showAlert('添加乘客失败，请稍后再试', 'error');
+                    });
+            },
+            goBack(){
+                window.history.go(-1);
+            },
+            showAlert(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `custom-alert ${type === 'success' ? 'custom-alert-success' : 'custom-alert-danger'}`;
+                
+                const alertContent = document.createElement('div');
+                alertContent.innerHTML = `<strong>${type === 'success' ? '成功' : '错误'}!</strong> ${message}`;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'custom-alert-close';
+                closeBtn.innerHTML = '×';
+                closeBtn.onclick = function() {
+                    alertDiv.remove();
+                };
+                
+                alertDiv.appendChild(alertContent);
+                alertDiv.appendChild(closeBtn);
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 3000);
+            }
+        },
+        mounted(){
+            // 检查用户是否登录
+            if(!this.user || !this.user.id) {
+                this.showAlert('请先登录后再操作', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+        }
+    })
+</script>
+</body>
+</html>

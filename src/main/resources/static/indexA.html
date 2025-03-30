@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员控制台 - 航班管理系统</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #003366 0%, #1e88e5 100%);
+            box-shadow: 0 2px 15px rgba(0,0,0,.2);
+            padding: 12px 0;
+        }
+        .navbar-brand {
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar-brand i {
+            font-size: 1.6rem;
+        }
+        .welcome-user {
+            color: white;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        .user-avatar {
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .user-avatar i {
+            font-size: 1.2rem;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,.08);
+            margin-bottom: 30px;
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,.12);
+        }
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #eaedf2;
+            font-weight: 600;
+            padding: 18px 25px;
+            font-size: 1.1rem;
+        }
+        .card-header i {
+            color: #1e88e5;
+        }
+        .card-body {
+            padding: 20px 25px;
+        }
+        .stats-row {
+            display: flex;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,.05);
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,.08);
+        }
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+        .stat-icon.users {
+            background-color: rgba(30, 136, 229, 0.15);
+            color: #1e88e5;
+        }
+        .stat-icon.flights {
+            background-color: rgba(67, 160, 71, 0.15);
+            color: #43a047;
+        }
+        .stat-content h3 {
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 600;
+        }
+        .stat-content p {
+            color: #6c757d;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        .table {
+            width: 100%;
+            margin-bottom: 0;
+            table-layout: fixed;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px #eaedf2;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 15px;
+            border-bottom: 1px solid #eaedf2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .table th {
+            background-color: #f8fafc;
+            color: #495057;
+            font-weight: 600;
+            border-top: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .btn {
+            border-radius: 6px;
+            font-weight: 500;
+            padding: 8px 16px;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 0.8rem;
+        }
+        .btn-custom-edit {
+            background-color: #1e88e5;
+            color: white;
+            box-shadow: 0 2px 5px rgba(30, 136, 229, 0.3);
+        }
+        .btn-custom-edit:hover {
+            background-color: #1976d2;
+            color: white;
+            box-shadow: 0 4px 10px rgba(30, 136, 229, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-custom-delete {
+            background-color: #e53935;
+            color: white;
+            box-shadow: 0 2px 5px rgba(229, 57, 53, 0.3);
+        }
+        .btn-custom-delete:hover {
+            background-color: #d32f2f;
+            color: white;
+            box-shadow: 0 4px 10px rgba(229, 57, 53, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-custom-add {
+            background-color: #43a047;
+            color: white;
+            box-shadow: 0 2px 5px rgba(67, 160, 71, 0.3);
+        }
+        .btn-custom-add:hover {
+            background-color: #388e3c;
+            color: white;
+            box-shadow: 0 4px 10px rgba(67, 160, 71, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-outline-light {
+            transition: all 0.2s;
+        }
+        .btn-outline-light:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .pagination .page-link {
+            color: #003366;
+            border: 1px solid #dee2e6;
+            margin: 0 2px;
+            border-radius: 4px;
+            font-weight: 500;
+            padding: 6px 12px;
+            transition: all 0.2s;
+        }
+        .pagination .active .page-link {
+            background-color: #003366;
+            border-color: #003366;
+            color: white;
+            z-index: 1;
+        }
+        .pagination .page-link:hover {
+            background-color: #f0f0f0;
+            border-color: #dee2e6;
+            z-index: 2;
+        }
+        .pagination .page-link:focus {
+            box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.25);
+            z-index: 3;
+        }
+        /* 用户表格列宽设置 */
+        .user-table th:nth-child(1), 
+        .user-table td:nth-child(1) {
+            width: 15%;
+            text-align: center;
+        }
+        .user-table th:nth-child(2), 
+        .user-table td:nth-child(2) {
+            width: 25%;
+            text-align: center;
+        }
+        .user-table th:nth-child(3), 
+        .user-table td:nth-child(3) {
+            width: 35%;
+            text-align: center;
+        }
+        .user-table th:nth-child(4), 
+        .user-table td:nth-child(4) {
+            width: 25%;
+            text-align: center;
+        }
+        
+        /* 航班表格列宽设置 */
+        .flight-table th:nth-child(1), 
+        .flight-table td:nth-child(1) {
+            width: 10%;
+            text-align: center;
+        }
+        .flight-table th:nth-child(2), 
+        .flight-table td:nth-child(2) {
+            width: 15%;
+            text-align: center;
+        }
+        .flight-table th:nth-child(3), 
+        .flight-table td:nth-child(3) {
+            width: 15%;
+            text-align: center;
+        }
+        .flight-table th:nth-child(4), 
+        .flight-table td:nth-child(4) {
+            width: 20%;
+            text-align: center;
+        }
+        .flight-table th:nth-child(5), 
+        .flight-table td:nth-child(5) {
+            width: 15%;
+            text-align: center;
+        }
+        .flight-table th:nth-child(6), 
+        .flight-table td:nth-child(6) {
+            width: 25%;
+            text-align: center;
+        }
+        .badge {
+            padding: 6px 10px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            border-radius: 30px;
+        }
+        .bg-success {
+            background-color: #43a047 !important;
+        }
+        .bg-warning {
+            background-color: #fb8c00 !important;
+        }
+        footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 25px 0;
+            margin-top: auto;
+        }
+        footer p {
+            opacity: 0.8;
+            font-weight: 300;
+        }
+        .empty-state {
+            padding: 30px;
+            text-align: center;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 32px;
+            margin-bottom: 15px;
+            opacity: 0.6;
+            color: #6c757d;
+        }
+        /* 自定义警告框样式 */
+        .custom-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        .custom-alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .custom-alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .custom-alert-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 15px;
+            opacity: 0.7;
+        }
+        
+        .custom-alert-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+    </style>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
+    <script src="js/axios-config.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-airplane"></i>
+                航班管理系统
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="welcome-user">
+                    <div class="user-avatar">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    管理员：{{user.username}}
+                </span>
+                <button class="btn btn-outline-light" @click="exit"><i class="bi bi-box-arrow-right me-2"></i>退出</button>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <!-- 统计信息区域 -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon users">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{userPage.total || 0}}</h3>
+                    <p>注册用户</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon flights">
+                    <i class="bi bi-airplane"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{page.total || 0}}</h3>
+                    <p>航班数量</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用户管理卡片 -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i>系统用户管理</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover user-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">序号</th>
+                                <th class="text-center">用户名</th>
+                                <th class="text-center">电话</th>
+                                <th class="text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(item, index) in userList">
+                            <td class="text-center">{{(userPage.pageNum - 1) * userPage.pageSize + index + 1}}</td>
+                            <td class="text-center">{{item.username}}</td>
+                            <td class="text-center">{{item.telephone}}</td>
+                            <td class="text-center">
+                                <a :href="'editUser.html?uid='+item.id" class="btn btn-custom-edit btn-sm">
+                                    <i class="bi bi-pencil-square me-1"></i>编辑
+                                </a>
+                            </td>
+                        </tr>
+                        <tr v-if="userList.length === 0">
+                            <td colspan="4" class="empty-state">
+                                <i class="bi bi-exclamation-circle d-block"></i>
+                                暂无用户数据
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <nav aria-label="Page navigation" class="d-flex justify-content-center mt-3" v-if="userList.length > 0">
+                    <ul class="pagination">
+                        <li class="page-item" v-if="userPage.pageNum > 1">
+                            <a class="page-link" href="#" @click="goto(1,1)" title="首页">
+                                首页
+                            </a>
+                        </li>
+                        <li class="page-item" v-if="userPage.hasPreviousPage">
+                            <a class="page-link" href="#" @click="goto(userPage.prePage,1)" title="上一页">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li :class="'page-item ' +(userPage.pageNum===item?'active':'')" v-for="item in userPage.navigatepageNums">
+                            <a class="page-link" href="#" @click="goto(item,1)">{{item}}</a>
+                        </li>
+                        <li class="page-item" v-if="userPage.hasNextPage">
+                            <a class="page-link" href="#" @click="goto(userPage.nextPage,1)" title="下一页">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" v-if="userPage.pageNum < userPage.pages">
+                            <a class="page-link" href="#" @click="goto(userPage.pages,1)" title="末页">
+                                末页
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- 航班管理卡片 -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-airplane-fill me-2"></i>航班信息管理</h5>
+                <a href="addOrUpdate.html" class="btn btn-custom-add btn-sm"><i class="bi bi-plus-circle me-1"></i>添加航班</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover flight-table">
+                        <thead>
+                        <tr>
+                            <th class="text-center">序号</th>
+                            <th class="text-center">起始地</th>
+                            <th class="text-center">目的地</th>
+                            <th class="text-center">起飞时间</th>
+                            <th class="text-center">票价</th>
+                            <th class="text-center">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(item, index) in list">
+                            <td class="text-center">{{(params.pageNum - 1) * params.pageSize + index + 1}}</td>
+                            <td class="text-center">{{item.source}}</td>
+                            <td class="text-center">{{item.target}}</td>
+                            <td class="text-center">{{item.time}}</td>
+                            <td class="text-center">
+                                <span :class="'badge bg-' + (item.num > 1000 ? 'success' : 'warning')">
+                                    ¥{{item.num}}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <a :href="'addOrUpdate.html?fid='+item.id" class="btn btn-custom-edit btn-sm">
+                                        <i class="bi bi-pencil-square me-1"></i>修改
+                                    </a>
+                                    <button @click="remove(item.id)" class="btn btn-custom-delete btn-sm ms-1">
+                                        <i class="bi bi-trash me-1"></i>删除
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if="list.length === 0">
+                            <td colspan="6" class="empty-state">
+                                <i class="bi bi-exclamation-circle d-block"></i>
+                                暂无航班数据
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <nav aria-label="Page navigation" class="d-flex justify-content-center mt-3" v-if="list.length > 0">
+                    <ul class="pagination">
+                        <li class="page-item" v-if="page.pageNum > 1">
+                            <a class="page-link" href="#" @click="goto(1,2)" title="首页">
+                                首页
+                            </a>
+                        </li>
+                        <li class="page-item" v-if="page.hasPreviousPage">
+                            <a class="page-link" href="#" @click="goto(page.prePage,2)" title="上一页">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li :class="'page-item ' +(page.pageNum===item?'active':'')" v-for="item in page.navigatepageNums">
+                            <a class="page-link" href="#" @click="goto(item,2)">{{item}}</a>
+                        </li>
+                        <li class="page-item" v-if="page.hasNextPage">
+                            <a class="page-link" href="#" @click="goto(page.nextPage,2)" title="下一页">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" v-if="page.pageNum < page.pages">
+                            <a class="page-link" href="#" @click="goto(page.pages,2)" title="末页">
+                                末页
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="text-white text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">© 航班管理系统 - 管理员控制台</p>
+        </div>
+    </footer>
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            userList:[],
+            userPage:{},
+            user:JSON.parse(sessionStorage.getItem("loginUser")),
+            list: [],
+            page: {},
+            params: {
+                pageNum: 1,
+                pageSize: 5
+            }
+        },
+        methods: {
+            remove(id){
+                if(confirm('确定要删除这个航班吗？这个操作不可恢复！')){
+                    let url='/api/v1/flight/remove/'+id
+                    axios.post(url)
+                        .then(res=>{
+                            console.log('删除响应:', res);
+                            const responseData = res.data;
+                            if(responseData && responseData.code === 200) {
+                                this.showAlert('航班已成功删除', 'success');
+                                this.loadData();
+                            } else {
+                                this.showAlert(responseData?.message || '删除失败', 'error');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('API错误:', err);
+                            this.showAlert('删除失败，请稍后再试', 'error');
+                        });
+                }
+            },
+            goto(pn,i){
+                if(i==1){
+                    this.getUser(pn)
+                }
+                if(i==2){
+                    this.params.pageNum=pn
+                    this.loadData()
+                }
+            },
+            exit(){
+                sessionStorage.removeItem("loginUser");
+                window.location.href='login.html';
+            },
+            loadData() {
+                let url = "/api/v1/flight/page";
+                axios.post(url, this.params)
+                    .then(res => {
+                        console.log('航班分页数据:', res);
+                        const responseData = res.data;
+                        if(responseData && responseData.code === 200 && responseData.data) {
+                            this.list = responseData.data.list || [];
+                            this.page = responseData.data;
+                            console.log('处理后的航班数据:', this.list);
+                        } else {
+                            this.list = [];
+                            this.page = { total: 0, pageNum: 1 };
+                            console.error('航班数据格式错误:', responseData);
+                            this.showAlert('航班数据格式错误', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('API错误:', err);
+                        this.showAlert('加载航班数据失败', 'error');
+                    });
+            },
+            getUser(pn){
+                let params={
+                    pageNum:1,
+                    pageSize:5,
+                };
+                if(pn){
+                    params.pageNum=pn;
+                }
+                let url='/api/v1/normalUser/page';
+                console.log('获取用户数据，请求URL:', url);
+                console.log('请求参数:', params);
+                
+                axios.post(url,params)
+                    .then(res=>{
+                        console.log('用户分页数据:', res);
+                        const responseData = res.data;
+                        if(responseData && responseData.code === 200 && responseData.data) {
+                            this.userList = responseData.data.list || [];
+                            this.userPage = responseData.data;
+                            console.log('处理后的用户数据:', this.userList);
+                        } else {
+                            this.userList = [];
+                            this.userPage = { total: 0, pageNum: 1 };
+                            console.error('用户数据格式错误:', responseData);
+                            this.showAlert('用户数据格式错误', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('API错误:', err);
+                        this.showAlert('加载用户数据失败', 'error');
+                    });
+            },
+            showAlert(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `custom-alert ${type === 'success' ? 'custom-alert-success' : 'custom-alert-danger'}`;
+                
+                const alertContent = document.createElement('div');
+                alertContent.innerHTML = `<strong>${type === 'success' ? '成功' : '错误'}!</strong> ${message}`;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'custom-alert-close';
+                closeBtn.innerHTML = '×';
+                closeBtn.onclick = function() {
+                    alertDiv.remove();
+                };
+                
+                alertDiv.appendChild(alertContent);
+                alertDiv.appendChild(closeBtn);
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 3000);
+            }
+        },
+        mounted() {
+            if(!this.user || !this.user.id) {
+                this.showAlert('请先登录', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+            
+            // 首先加载航班数据
+            this.loadData();
+            
+            // 然后加载用户数据
+            this.getUser();
+        }
+    })
+</script>
+</body>
+</html>

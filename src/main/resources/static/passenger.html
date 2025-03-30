@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乘客详情 - 航班管理系统</title>
+    <link rel="stylesheet" href="css/bootstrap-grid.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.rtl.css">
+    <link rel="stylesheet" href="css/bootstrap.rtl.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="css/bootstrap-reboot.css">
+    <link rel="stylesheet" href="css/bootstrap-utilities.css">
+    <link rel="stylesheet" href="css/bootstrap-utilities.rtl.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/pintuer.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
+    <script src="js/axios-config.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #003366 0%, #1e88e5 100%);
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 60px);
+        }
+        .passenger-card {
+            width: 600px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            padding: 0;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .passenger-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        .card-header {
+            background: linear-gradient(135deg, #003366 0%, #1a5fa0 100%);
+            color: white;
+            padding: 20px 25px;
+            font-weight: 600;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .card-header i {
+            font-size: 1.6rem;
+        }
+        .card-body {
+            padding: 30px 25px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #495057;
+            font-size: 15px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .form-control:focus {
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.25);
+            outline: none;
+        }
+        .input-group {
+            display: flex;
+        }
+        .input-group-text {
+            background-color: #f5f7fa;
+            border: 1px solid #ddd;
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            color: #1e88e5;
+        }
+        .input-group .form-control {
+            border-radius: 0 8px 8px 0;
+        }
+        .flight-tag {
+            display: inline-block;
+            background-color: #1e88e5;
+            color: white;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 30px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(30, 136, 229, 0.3);
+        }
+        .flight-tag:hover {
+            background-color: #e53935;
+            box-shadow: 0 4px 8px rgba(229, 57, 53, 0.4);
+            transform: translateY(-2px);
+        }
+        .flight-tag i {
+            margin-left: 6px;
+        }
+        .flight-list {
+            min-height: 60px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px dashed #dde2e8;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-color: #1e88e5;
+            color: white;
+            box-shadow: 0 2px 5px rgba(30, 136, 229, 0.3);
+        }
+        .btn-primary:hover {
+            background-color: #1976d2;
+            box-shadow: 0 4px 10px rgba(30, 136, 229, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background-color: #e53935;
+            color: white;
+            box-shadow: 0 2px 5px rgba(229, 57, 53, 0.3);
+        }
+        .btn-danger:hover {
+            background-color: #d32f2f;
+            box-shadow: 0 4px 10px rgba(229, 57, 53, 0.4);
+            transform: translateY(-2px);
+        }
+        .empty-message {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 15px;
+            font-size: 14px;
+        }
+        .empty-message i {
+            font-size: 20px;
+            margin-right: 6px;
+            color: #6c757d;
+            opacity: 0.7;
+        }
+        .alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            z-index: 9999;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+        .alert-success {
+            background-color: #43a047;
+            color: white;
+        }
+        .alert-danger {
+            background-color: #e53935;
+            color: white;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        /* 自定义警告框样式 */
+        .custom-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        .custom-alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .custom-alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .custom-alert-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 15px;
+            opacity: 0.7;
+        }
+        
+        .custom-alert-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <div class="passenger-card">
+            <div class="card-header">
+                <i class="bi bi-person-badge"></i> 乘客详情
+            </div>
+            <div class="card-body">
+                <form method="post" @submit.prevent="submit">
+                    <div class="form-group">
+                        <label for="passengerName" class="form-label">乘客姓名</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="hidden" v-model="passenger.id">
+                            <input type="text" id="passengerName" class="form-control" v-model="passenger.name" placeholder="请输入乘客姓名">
+                        </div>
+                        <div v-if="debug" class="mt-2 text-muted">
+                            <small>调试信息: {{passenger.name}}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passengerIdNum" class="form-label">身份证号</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                            <input type="text" id="passengerIdNum" class="form-control" v-model="passenger.idNum" placeholder="请输入身份证号">
+                        </div>
+                        <div v-if="debug" class="mt-2 text-muted">
+                            <small>调试信息: {{passenger.idNum}}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">已预订的航班</label>
+                        <div class="flight-list">
+                            <div v-if="passenger.flights && passenger.flights.length > 0">
+                                <span v-for="(item, i) in passenger.flights" class="flight-tag" 
+                                      title="点击移除该航班" @click="removeFlight(i)">
+                                    {{i+1}}. {{item.source}} → {{item.target}}
+                                    <i class="bi bi-x-circle"></i>
+                                </span>
+                            </div>
+                            <div v-else class="empty-message">
+                                <i class="bi bi-info-circle"></i>该乘客尚未预订任何航班
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i>保存修改
+                        </button>
+                        <button type="button" class="btn btn-danger" @click="goBack">
+                            <i class="bi bi-arrow-left"></i>返回
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        new Vue({
+            el:"#app",
+            data:{
+                passenger:{
+                    id: null,
+                    name: '',
+                    idNum: '',
+                    userId: null,
+                    flights:[]
+                },
+                debug: true
+            },
+            methods:{
+                removeFlight(i){
+                    if(confirm('确定要取消此航班预订吗？')) {
+                        this.passenger.flights.splice(i,1);
+                    }
+                },
+                submit(){
+                    if(!this.passenger.name || this.passenger.name.trim() === '') {
+                        this.showAlert('乘客姓名不能为空', 'error');
+                        return;
+                    }
+                    
+                    if(!this.passenger.idNum || this.passenger.idNum.trim() === '') {
+                        this.showAlert('身份证号不能为空', 'error');
+                        return;
+                    }
+                    
+                    let url='/api/v1/passenger/cancel';
+                    
+                    // 构建提交的数据，确保符合PassengerCancelDTO的结构
+                    const submitData = {
+                        id: this.passenger.id,
+                        flights: this.passenger.flights || []
+                    };
+                    
+                    // 同时更新用户信息到Passenger对象
+                    let updateUrl = '/api/v1/passenger/save';
+                    const passengerData = {
+                        id: this.passenger.id,
+                        name: this.passenger.name,
+                        idNum: this.passenger.idNum,
+                        userId: this.passenger.userId
+                    };
+                    
+                    console.log('提交的乘客数据:', passengerData);
+                    console.log('提交的航班数据:', submitData);
+                    
+                    // 首先更新乘客基本信息
+                    axios.post(url, submitData)
+                        .then(res=>{
+                            console.log('提交响应:', res);
+                            const responseData = res.data;
+                            if(responseData && responseData.code === 200) {
+                                this.showAlert('更新成功，即将返回首页', 'success');
+                                setTimeout(() => {
+                                    window.location.href='indexU.html';
+                                }, 2000);
+                            } else {
+                                this.showAlert(responseData?.message || '保存失败', 'error');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('提交错误:', err);
+                            this.showAlert('保存失败，请稍后再试', 'error');
+                        });
+                },
+                goBack(){
+                    window.history.go(-1);
+                },
+                showAlert(message, type) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = `custom-alert ${type === 'success' ? 'custom-alert-success' : 'custom-alert-danger'}`;
+                    
+                    const alertContent = document.createElement('div');
+                    alertContent.innerHTML = `<strong>${type === 'success' ? '成功' : '错误'}!</strong> ${message}`;
+                    
+                    const closeBtn = document.createElement('button');
+                    closeBtn.className = 'custom-alert-close';
+                    closeBtn.innerHTML = '×';
+                    closeBtn.onclick = function() {
+                        alertDiv.remove();
+                    };
+                    
+                    alertDiv.appendChild(alertContent);
+                    alertDiv.appendChild(closeBtn);
+                    document.body.appendChild(alertDiv);
+                    
+                    setTimeout(() => {
+                        alertDiv.remove();
+                    }, 3000);
+                }
+            },
+            mounted(){
+                let urlObj=new URL(window.location.href)
+                let params=new URLSearchParams(urlObj.search)
+                let id=params.get('id')
+                console.log('乘客ID:', id);
+                
+                if(id){
+                    let url='/api/v1/passenger/detail/'+id
+                    axios.get(url)
+                        .then(res=>{
+                            console.log('API返回完整数据:', JSON.stringify(res));
+                            const responseData = res.data;
+                            console.log('乘客数据:', responseData.data);
+                            
+                            if(responseData && responseData.code === 200 && responseData.data) {
+                                const passengerData = responseData.data;
+                                this.passenger = {
+                                    id: passengerData.id || null,
+                                    name: passengerData.name || '',
+                                    idNum: passengerData.idNum || '',
+                                    userId: passengerData.userId || null,
+                                    flights: passengerData.flights || []
+                                };
+                                console.log('设置后的乘客数据:', this.passenger);
+                            } else {
+                                console.error('乘客数据格式错误:', responseData);
+                                this.showAlert(responseData?.message || '数据格式错误', 'error');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('API错误:', err);
+                            this.showAlert('加载乘客信息失败', 'error');
+                        });
+                }
+            }
+        })
+    </script>
+</body>
+</html>

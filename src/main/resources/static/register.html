@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 航班管理系统</title>
+    <link rel="stylesheet" href="css/bootstrap-grid.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.rtl.css">
+    <link rel="stylesheet" href="css/bootstrap.rtl.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="css/bootstrap-reboot.css">
+    <link rel="stylesheet" href="css/bootstrap-utilities.css">
+    <link rel="stylesheet" href="css/bootstrap-utilities.rtl.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
+    <script src="js/axios-config.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #003366 0%, #1e88e5 100%);
+        }
+        .register-container {
+            width: 450px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .register-header h1 {
+            color: #003366;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .register-header p {
+            color: #78909c;
+            font-size: 14px;
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .form-control:focus {
+            border-color: #1e88e5;
+            box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.25);
+        }
+        .input-group-text {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px 0 0 8px;
+        }
+        .btn-register {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-register:hover {
+            background-color: #218838;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #78909c;
+        }
+        .login-link a {
+            color: #003366;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        /* 自定义警告框样式 */
+        .custom-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        .custom-alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .custom-alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .custom-alert-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 15px;
+            opacity: 0.7;
+        }
+        
+        .custom-alert-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+    </style>
+</head>
+<body>
+<div id="app" class="container">
+    <div class="register-container">
+        <div class="register-header">
+            <h1><i class="bi bi-airplane me-2"></i>航班管理系统</h1>
+            <p>创建新账户</p>
+        </div>
+        <form @submit.prevent="register">
+            <div class="mb-3">
+                <label for="username" class="form-label">用户名</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="username" v-model="user.username" placeholder="请输入用户名">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">密码</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input name="password" id="password" class="form-control" type="password" v-model="user.password" placeholder="请输入密码">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="telephone" class="form-label">电话</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                    <input name="telephone" id="telephone" class="form-control" type="text" v-model="user.telephone" placeholder="请输入电话">
+                </div>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-register">
+                    <i class="bi bi-person-plus me-2"></i>注册
+                </button>
+            </div>
+            <div class="login-link">
+                已有账号? <a href="login.html">立即登录</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    new Vue({
+        el:"#app",
+        data:{
+            user:{
+                username:null,
+                password:null,
+                telephone:null
+            }
+        },
+        methods:{
+            register(){
+                if(this.user.username==null || this.user.username.trim()==''){
+                    this.showAlert('用户名不能为空', 'error');
+                    return false;
+                }
+                if(this.user.password==null || this.user.password.trim()==''){
+                    this.showAlert('密码不能为空', 'error');
+                    return false;
+                }
+                if(this.user.telephone==null || this.user.telephone.trim()==''){
+                    this.showAlert('电话不能为空', 'error');
+                    return false;
+                }
+                
+                // 验证电话号码格式
+                const phoneRegex = /^1[3-9]\d{9}$/;
+                if (!phoneRegex.test(this.user.telephone)) {
+                    this.showAlert('请输入有效的手机号码', 'error');
+                    return false;
+                }
+                
+                // 使用新的控制器路径
+                let url='/api/v1/normalUser/save'
+                axios.post(url,this.user)
+                    .then(res=>{
+                        console.log('注册响应:', res.data);
+                        if(res.data && res.data.code === 200) {
+                            this.showAlert('注册成功，即将跳转到登录页面', 'success');
+                            setTimeout(() => {
+                                window.location.href='login.html';
+                            }, 2000);
+                        } else {
+                            this.showAlert(res.data?.message || '注册失败', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('注册错误:', err);
+                        this.showAlert('注册失败，请稍后再试', 'error');
+                    });
+            },
+            showAlert(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `custom-alert ${type === 'success' ? 'custom-alert-success' : 'custom-alert-danger'}`;
+                
+                const alertContent = document.createElement('div');
+                alertContent.innerHTML = `<strong>${type === 'success' ? '成功' : '错误'}!</strong> ${message}`;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'custom-alert-close';
+                closeBtn.innerHTML = '×';
+                closeBtn.onclick = function() {
+                    alertDiv.remove();
+                };
+                
+                alertDiv.appendChild(alertContent);
+                alertDiv.appendChild(closeBtn);
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 3000);
+            }
+        }
+    })
+</script>
+</body>
+</html>

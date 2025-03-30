@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预订机票 - 航班管理系统</title>
+    <link rel="stylesheet" href="css/bootstrap-grid.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.rtl.css">
+    <link rel="stylesheet" href="css/bootstrap.rtl.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="css/bootstrap-reboot.css">
+    <link rel="stylesheet" href="css/bootstrap-utilities.css">
+    <link rel="stylesheet" href="css/bootstrap-utilities.rtl.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="js/bootstrap.js"></script>
+    <script src="js/bootstrap.bundle.js"></script>
+    <script src="js/bootstrap.esm.js"></script>
+    <script src="js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
+    <script src="js/axios-config.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #003366 0%, #1e88e5 100%);
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .main-content {
+            padding: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            color: #003366;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .btn-primary {
+            background-color: #003366;
+            border-color: #003366;
+        }
+        .btn-primary:hover {
+            background-color: #002855;
+            border-color: #002855;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #212529;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+            color: #212529;
+        }
+        .table {
+            width: 100%;
+            margin-bottom: 0;
+            table-layout: fixed;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            border-top: none;
+        }
+        /* 乘客表格列宽设置 */
+        .passenger-table th:nth-child(1), 
+        .passenger-table td:nth-child(1) {
+            width: 10%;
+            text-align: center;
+        }
+        .passenger-table th:nth-child(2), 
+        .passenger-table td:nth-child(2) {
+            width: 20%;
+            text-align: center;
+        }
+        .passenger-table th:nth-child(3), 
+        .passenger-table td:nth-child(3) {
+            width: 40%;
+            text-align: center;
+        }
+        .passenger-table th:nth-child(4), 
+        .passenger-table td:nth-child(4) {
+            width: 30%;
+            text-align: center;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .pagination .page-link {
+            color: #003366;
+            border: 1px solid #dee2e6;
+            margin: 0 2px;
+            border-radius: 4px;
+            font-weight: 500;
+            padding: 6px 12px;
+            transition: all 0.2s;
+        }
+        .pagination .active .page-link {
+            background-color: #003366;
+            border-color: #003366;
+            color: white;
+            z-index: 1;
+        }
+        .pagination .page-link:hover {
+            background-color: #f0f0f0;
+            border-color: #dee2e6;
+            z-index: 2;
+        }
+        .pagination .page-link:focus {
+            box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.25);
+            z-index: 3;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .action-buttons {
+            white-space: nowrap;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        .empty-message {
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+        .footer-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .order-summary {
+            background-color: #e9f5ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .passenger-count {
+            display: inline-block;
+            background-color: #003366;
+            color: white;
+            font-weight: bold;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+        /* 自定义警告框样式 */
+        .custom-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        .custom-alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .custom-alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .custom-alert-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 15px;
+            opacity: 0.7;
+        }
+        
+        .custom-alert-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="header">
+        <h1><i class="bi bi-airplane me-2"></i>航班管理系统</h1>
+        <a href="indexU.html" class="btn btn-outline-light">
+            <i class="bi bi-house-door me-1"></i>返回首页
+        </a>
+    </div>
+    
+    <div class="main-content">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="h5 mb-0"><i class="bi bi-info-circle me-2"></i>航班信息</h2>
+            </div>
+            <div class="card-body" v-if="flightInfo">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <strong>起点:</strong> {{flightInfo.source}}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>终点:</strong> {{flightInfo.target}}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>起飞时间:</strong> {{flightInfo.time}}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>票价:</strong> <span class="badge bg-success">¥{{flightInfo.num}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" v-else>
+                <div class="text-center py-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">加载中...</span>
+                    </div>
+                    <p class="mt-2">正在加载航班信息...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h5 mb-0"><i class="bi bi-ticket-perforated me-2"></i>选择乘客</h2>
+            </div>
+            <div class="card-body">
+                <div class="order-summary" v-if="orderList.length > 0">
+                    <h4><i class="bi bi-info-circle me-2"></i>订单摘要</h4>
+                    <p class="mb-1">您已选择 <span class="passenger-count">{{orderList.length}}</span> 位乘客</p>
+                    <p class="mb-1" v-if="flightInfo"><strong>总价:</strong> <span class="badge bg-success">¥{{orderList.length * flightInfo.num}}</span></p>
+                    <p class="text-muted small">完成选择后，请点击下方的"提交订单"按钮</p>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover passenger-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">序号</th>
+                                <th class="text-center">姓名</th>
+                                <th class="text-center">身份证号</th>
+                                <th class="text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 加载中状态 -->
+                            <tr v-if="loading">
+                                <td colspan="4" class="text-center py-4">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <div class="spinner-border text-primary me-3" role="status">
+                                            <span class="visually-hidden">加载中...</span>
+                                        </div>
+                                        <span>正在加载乘客信息，请稍候...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- 乘客数据行 -->
+                            <tr v-else v-for="(item, index) in passengers">
+                                <td class="text-center">{{(passengersPage.pageNum - 1) * passengersPage.pageSize + index + 1}}</td>
+                                <td class="text-center">{{item.name}}</td>
+                                <td class="text-center">{{item.idNum}}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button v-if="!item.isAdd" class="btn btn-sm btn-success" @click="order(item)">
+                                            <i class="bi bi-plus-circle me-1"></i>添加乘客
+                                        </button>
+                                        <button v-else class="btn btn-sm btn-danger" @click="remove(item)">
+                                            <i class="bi bi-dash-circle me-1"></i>移除乘客
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- 空数据状态 -->
+                            <tr v-if="!loading && passengers.length === 0">
+                                <td colspan="4" class="empty-message">
+                                    <i class="bi bi-exclamation-circle me-2"></i>未找到乘客信息
+                                    <p class="mt-2 text-muted">您需要先添加乘客才能继续预订机票</p>
+                                    <div class="mt-3">
+                                        <a href="bind.html" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-person-plus me-1"></i>添加乘客
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <nav aria-label="Page navigation" v-if="passengers.length > 0">
+                    <ul class="pagination">
+                        <li class="page-item" v-if="passengersPage.pageNum > 1">
+                            <a class="page-link" href="#" @click="goto(1)" title="首页">
+                                首页
+                            </a>
+                        </li>
+                        <li class="page-item" v-if="passengersPage.hasPreviousPage">
+                            <a class="page-link" href="#" @click="goto(passengersPage.prePage)" title="上一页">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li :class="'page-item ' +(passengersPage.pageNum===item?'active':'')" 
+                            v-for="item in passengersPage.navigatepageNums">
+                            <a class="page-link" href="#" @click="goto(item)">{{item}}</a>
+                        </li>
+                        <li class="page-item" v-if="passengersPage.hasNextPage">
+                            <a class="page-link" href="#" @click="goto(passengersPage.nextPage)" title="下一页">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item" v-if="passengersPage.pageNum < passengersPage.pages">
+                            <a class="page-link" href="#" @click="goto(passengersPage.pages)" title="末页">
+                                末页
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <div class="footer-actions">
+                    <button @click="submit" class="btn btn-primary" :disabled="orderList.length === 0">
+                        <i class="bi bi-check2-circle me-1"></i>提交订单
+                    </button>
+                    <a href="indexU.html" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>返回
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    new Vue({
+        el:"#app",
+        data:{
+            orderList:[],
+            passengersPage:{},
+            passengers:[],
+            flightId:null,
+            flightInfo: null,
+            user:null,
+            loading: true
+        },
+        methods:{
+            submit(){
+                if(this.orderList.length === 0) {
+                    this.showAlert('请至少选择一位乘客', 'error');
+                    return;
+                }
+                
+                let completedCount = 0;
+                let totalCount = this.orderList.length;
+                let hasError = false;
+                
+                for (let i = 0; i < totalCount; i++) {
+                    let url='/api/v1/passenger/order/'+this.orderList[i]+'/'+this.flightId
+                    axios.post(url)
+                        .then(res=>{
+                            completedCount++;
+                            if(completedCount === totalCount && !hasError) {
+                                this.showAlert('订单提交成功，即将返回首页', 'success');
+                                setTimeout(() => {
+                                    window.location.href='indexU.html';
+                                }, 2000);
+                            }
+                        })
+                        .catch(err => {
+                            hasError = true;
+                            console.error(err);
+                            this.showAlert('提交订单失败，请稍后再试', 'error');
+                        });
+                }
+            },
+            remove(item){
+                item.isAdd=false
+                while ((index = this.orderList.indexOf(item.id)) > -1) {
+                    this.orderList.splice(index, 1);
+                }
+            },
+            order(item){
+                item.isAdd=true
+                this.orderList.push(item.id)
+            },
+            goto(pn){
+                this.getPassenger(pn);
+            },
+            getPassenger(pn){
+                // 检查用户是否登录
+                if(!this.user || !this.user.id) {
+                    console.error('用户未登录或登录信息不完整');
+                    this.showAlert('请先登录后再操作', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                    return;
+                }
+                
+                // 确保页面显示加载中状态
+                this.loading = true;
+                this.passengers = [];
+                
+                // 确保用户ID是数字类型
+                const userId = parseInt(this.user.id);
+                if(isNaN(userId)) {
+                    console.error('用户ID不是有效数字:', this.user.id);
+                    this.showAlert('用户ID格式错误', 'error');
+                    return;
+                }
+                
+                let params = {
+                    pageNum: pn || 1,
+                    pageSize: 20, // 增加页面大小，以便更容易找到所有乘客
+                    uid: userId
+                };
+                
+                console.log('请求参数:', params);
+                console.log('用户ID:', userId, '用户信息:', this.user);
+                
+                let url = '/api/v1/passenger/page';
+                
+                // 添加请求超时
+                const requestConfig = {
+                    timeout: 10000 // 10秒超时
+                };
+                
+                axios.post(url, params, requestConfig)
+                    .then(res => {
+                        this.loading = false;
+                        console.log('乘客数据响应:', res);
+                        
+                        // 检查响应状态和数据
+                        if (!res || !res.data) {
+                            console.error('API响应为空');
+                            this.showAlert('服务器响应异常，请刷新页面重试', 'error');
+                            return;
+                        }
+                        
+                        const responseData = res.data;
+                        
+                        // 检查业务状态码
+                        if (responseData.code !== 200) {
+                            console.error('API返回错误:', responseData);
+                            this.showAlert(responseData.message || '加载乘客信息失败', 'error');
+                            return;
+                        }
+                        
+                        // 确保data存在
+                        if (!responseData.data) {
+                            console.error('API返回数据格式不正确(data缺失):', responseData);
+                            this.showAlert('数据格式不正确', 'error');
+                            return;
+                        }
+                        
+                        // 设置分页信息，即使list为null也设置
+                        this.passengersPage = responseData.data;
+                        
+                        // 初始化passengers数组为空
+                        this.passengers = [];
+                        
+                        // 检查list是否存在
+                        if (!responseData.data.list) {
+                            console.error('API返回数据格式不正确(list缺失):', responseData);
+                            return;
+                        }
+                        
+                        // 检查乘客列表是否为空
+                        if (responseData.data.list.length === 0) {
+                            console.log('未找到乘客数据，但这是正常的空结果');
+                            // 不显示错误，保持空列表
+                            return;
+                        }
+                        
+                        // 处理乘客数据
+                        responseData.data.list.forEach(item => {
+                            // 增加检查，确保item.id存在
+                            if (item && item.id) {
+                                // 标记已添加的乘客
+                                item.isAdd = this.orderList.includes(item.id);
+                                this.passengers.push(item);
+                            } else {
+                                console.warn('跳过无效乘客数据:', item);
+                            }
+                        });
+                        
+                        console.log('成功加载乘客:', this.passengers.length, '条记录');
+                    })
+                    .catch(err => {
+                        this.loading = false;
+                        console.error('加载乘客数据错误:', err);
+                        
+                        // 检查是否为超时错误
+                        if (err.code === 'ECONNABORTED') {
+                            this.showAlert('请求超时，请检查网络连接', 'error');
+                            return;
+                        }
+                        
+                        // 检查是否为网络错误
+                        if (!err.response) {
+                            this.showAlert('网络连接错误，请检查网络连接', 'error');
+                            return;
+                        }
+                        
+                        // 服务器返回错误响应
+                        if (err.response.status) {
+                            this.showAlert(`服务器错误(${err.response.status})，请联系管理员`, 'error');
+                            return;
+                        }
+                        
+                        // 其他错误
+                        this.showAlert('加载乘客信息失败，请稍后再试', 'error');
+                    });
+            },
+            showAlert(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `custom-alert ${type === 'success' ? 'custom-alert-success' : 'custom-alert-danger'}`;
+                
+                const alertContent = document.createElement('div');
+                alertContent.innerHTML = `<strong>${type === 'success' ? '成功' : '错误'}!</strong> ${message}`;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'custom-alert-close';
+                closeBtn.innerHTML = '×';
+                closeBtn.onclick = function() {
+                    alertDiv.remove();
+                };
+                
+                alertDiv.appendChild(alertContent);
+                alertDiv.appendChild(closeBtn);
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 3000);
+            },
+            checkLogin() {
+                if(!this.user || !this.user.id) {
+                    this.showAlert('请先登录后再操作', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                    return false;
+                }
+                return true;
+            },
+            // 获取航班详情
+            getFlightInfo() {
+                if(!this.flightId) {
+                    console.error('航班ID为空，无法获取航班信息');
+                    return;
+                }
+                
+                let url = `/api/v1/flight/detail/${this.flightId}`;
+                axios.get(url)
+                    .then(res => {
+                        console.log('航班详情响应:', res);
+                        const responseData = res.data;
+                        if(responseData && responseData.code === 200 && responseData.data) {
+                            this.flightInfo = responseData.data;
+                        } else {
+                            this.showAlert('获取航班信息失败', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('获取航班信息错误:', err);
+                        this.showAlert('获取航班信息失败', 'error');
+                    });
+            }
+        },
+        mounted(){
+            // 从会话存储中获取用户信息
+            try {
+                const userStr = sessionStorage.getItem("loginUser");
+                if(userStr) {
+                    this.user = JSON.parse(userStr);
+                    console.log('已从会话存储获取用户信息:', this.user);
+                }
+            } catch(e) {
+                console.error('解析用户信息出错:', e);
+            }
+            
+            // 先检查登录状态
+            if(this.checkLogin()) {
+                // 获取航班ID
+                try {
+                    let urlObj = new URL(window.location.href);
+                    let params = new URLSearchParams(urlObj.search);
+                    this.flightId = params.get("fid");
+                    
+                    if(!this.flightId) {
+                        this.showAlert('航班ID不能为空', 'error');
+                        setTimeout(() => {
+                            window.location.href = 'indexU.html';
+                        }, 1500);
+                        return;
+                    }
+                    
+                    console.log('当前航班ID:', this.flightId);
+                    
+                    // 加载航班信息
+                    this.getFlightInfo();
+                    
+                    // 加载乘客数据
+                    this.getPassenger();
+                } catch(e) {
+                    console.error('解析URL参数出错:', e);
+                    this.showAlert('系统错误，请返回重试', 'error');
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>
